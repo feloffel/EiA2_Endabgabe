@@ -24,16 +24,19 @@ var EisDealer;
             this.deleteIn = null; // Initialisiere mit null
         }
         draw(ctx) {
-            const radius = 20;
+            const radius = 30;
+            let mouthType = 'smile'; // Standard Mundtyp
             // Ändere die Farbe basierend auf der Zeit am Tisch
-            if (this.deleteIn !== null) {
-                ctx.fillStyle = 'red';
+            if (this.matched) {
+                ctx.fillStyle = 'blue'; // Blau für Kunden, die das richtige Eis bekommen haben
             }
-            else if (this.timeAtTable >= 60) {
+            else if (this.deleteIn !== null || this.timeAtTable >= 190) {
                 ctx.fillStyle = 'red';
+                mouthType = 'sad';
             }
-            else if (this.timeAtTable >= 30) {
+            else if (this.timeAtTable >= 100) {
                 ctx.fillStyle = 'orange';
+                mouthType = 'neutral';
             }
             else {
                 ctx.fillStyle = 'green';
@@ -42,15 +45,25 @@ var EisDealer;
             ctx.arc(this.x, this.y, radius, 0, Math.PI * 2);
             ctx.fill();
             ctx.strokeStyle = 'black'; // Setze die Umrandungsfarbe auf Schwarz
-            ctx.lineWidth = 1; // Setze die Linienbreite auf 1
+            ctx.lineWidth = 3; // Setze die Linienbreite auf 1
             ctx.stroke();
             ctx.fillStyle = 'black';
             ctx.beginPath();
             ctx.arc(this.x - 7, this.y - 7, 3, 0, Math.PI * 2);
             ctx.arc(this.x + 7, this.y - 7, 3, 0, Math.PI * 2);
             ctx.fill();
+            // Mund basierend auf mouthType ändern
             ctx.beginPath();
-            ctx.arc(this.x, this.y + 5, 10, 0, Math.PI, false);
+            if (mouthType === 'sad') {
+                ctx.arc(this.x, this.y + 15, 10, Math.PI, 2 * Math.PI, false); // trauriger Mund
+            }
+            else if (mouthType === 'neutral') {
+                ctx.moveTo(this.x - 10, this.y + 5);
+                ctx.lineTo(this.x + 10, this.y + 5); // horizontaler Strich
+            }
+            else {
+                ctx.arc(this.x, this.y + 5, 10, 0, Math.PI, false); // lachender Mund
+            }
             ctx.stroke();
             if (this.hasTable && this.arrived) {
                 ctx.font = '12px Arial';

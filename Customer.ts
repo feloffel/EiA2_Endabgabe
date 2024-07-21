@@ -24,43 +24,54 @@ namespace EisDealer {
         }
 
         draw(ctx: CanvasRenderingContext2D): void {
-            const radius = 20;
-
+            const radius = 30;
+            let mouthType = 'smile'; // Standard Mundtyp
+        
             // Ändere die Farbe basierend auf der Zeit am Tisch
-            if (this.deleteIn !== null) {
+            if (this.matched) {
+                ctx.fillStyle = 'blue'; // Blau für Kunden, die das richtige Eis bekommen haben
+            } else if (this.deleteIn !== null || this.timeAtTable >= 190) {
                 ctx.fillStyle = 'red';
-            } else if (this.timeAtTable >= 60) {
-                ctx.fillStyle = 'red';
-            } else if (this.timeAtTable >= 30) {
+                mouthType = 'sad';
+            } else if (this.timeAtTable >= 100) {
                 ctx.fillStyle = 'orange';
+                mouthType = 'neutral';
             } else {
                 ctx.fillStyle = 'green';
             }
-
+        
             ctx.beginPath();
             ctx.arc(this.x, this.y, radius, 0, Math.PI * 2);
             ctx.fill();
             
             ctx.strokeStyle = 'black'; // Setze die Umrandungsfarbe auf Schwarz
-            ctx.lineWidth = 1; // Setze die Linienbreite auf 1
+            ctx.lineWidth = 3; // Setze die Linienbreite auf 1
             ctx.stroke();
-
+        
             ctx.fillStyle = 'black';
             ctx.beginPath();
             ctx.arc(this.x - 7, this.y - 7, 3, 0, Math.PI * 2);
             ctx.arc(this.x + 7, this.y - 7, 3, 0, Math.PI * 2);
             ctx.fill();
-
+        
+            // Mund basierend auf mouthType ändern
             ctx.beginPath();
-            ctx.arc(this.x, this.y + 5, 10, 0, Math.PI, false);
+            if (mouthType === 'sad') {
+                ctx.arc(this.x, this.y + 15, 10, Math.PI, 2 * Math.PI, false); // trauriger Mund
+            } else if (mouthType === 'neutral') {
+                ctx.moveTo(this.x - 10, this.y + 5);
+                ctx.lineTo(this.x + 10, this.y + 5); // horizontaler Strich
+            } else {
+                ctx.arc(this.x, this.y + 5, 10, 0, Math.PI, false); // lachender Mund
+            }
             ctx.stroke();
-
+        
             if (this.hasTable && this.arrived) {
                 ctx.font = '12px Arial';
                 const padding = 10;
                 const lineHeight = 16;
                 const bubbleHeight = (this.iceCombination.length * lineHeight) + (padding * 2);
-
+        
                 let maxTextWidth = 0;
                 this.iceCombination.forEach(line => {
                     const textWidth = ctx.measureText(line).width;
@@ -68,19 +79,19 @@ namespace EisDealer {
                         maxTextWidth = textWidth;
                     }
                 });
-
+        
                 const bubbleWidth = maxTextWidth + padding * 2;
-
+        
                 ctx.fillStyle = 'white';
                 ctx.fillRect(this.x - bubbleWidth / 2, this.y - bubbleHeight - 40, bubbleWidth, bubbleHeight);
                 ctx.strokeRect(this.x - bubbleWidth / 2, this.y - bubbleHeight - 40, bubbleWidth, bubbleHeight);
                 ctx.fillStyle = 'black';
                 ctx.textAlign = 'center';
-
+        
                 this.iceCombination.forEach((line, index) => {
                     ctx.fillText(line, this.x, this.y - bubbleHeight - 40 + padding + (index + 1) * lineHeight - 4);
                 });
-
+        
                 ctx.textAlign = 'left';
             }
         }

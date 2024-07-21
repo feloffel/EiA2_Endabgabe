@@ -14,6 +14,12 @@ namespace EisDealer {
             console.log("Kein Name für die Eisdiele gefunden, Standardname wird verwendet:", ParlourName);
         }
         addCustomer();
+
+        // Hintergrundmusik laden und abspielen
+        const backgroundMusic = new Audio('sounds/background.mp3'); // Pfad zur Hintergrundmusikdatei anpassen
+        backgroundMusic.loop = true; // Musik in Schleife abspielen
+        backgroundMusic.play();
+
     });
 
     // CANVAS ALLGEMEIN
@@ -51,7 +57,7 @@ namespace EisDealer {
 
 
 
-    setInterval(addCustomer, 20000);
+    setInterval(addCustomer, 10000);
 
 
 
@@ -298,8 +304,12 @@ canvas.addEventListener('click', function(event) {
 
 
 // Überprüfen, ob der Mülleimer angeklickt wurde
+
+const trashSound = new Audio('sounds/trash.wav'); // Pfad zur Sounddatei anpassen
+
 if (x >= staticElements.trashCanX && x <= staticElements.trashCanX + staticElements.trashCanWidth &&
     y >= staticElements.trashCanY && y <= staticElements.trashCanY + staticElements.trashCanHeight) {
+    trashSound.play();
     // Leeren des Arrays mit ausgewählten Elementen
     earnings -= currentItemPrice;
     selectedItems = [];
@@ -364,18 +374,18 @@ canvas.addEventListener('mousedown', function(event) {
 
 canvas.addEventListener('mousemove', function(event) {
     if (isDragging) {
-        const rect = canvas.getBoundingClientRect();
-        const x = event.clientX - rect.left;
-        const y = event.clientY - rect.top;
-
-        dragOffsetX = x;
-        dragOffsetY = y;
-
-        redrawCanvas();
-        redrawSelectedItems(dragOffsetX - dragStartX, dragOffsetY - dragStartY);
+    const rect = canvas.getBoundingClientRect();
+    dragOffsetX = event.clientX - rect.left - dragStartX;
+    dragOffsetY = event.clientY - rect.top - dragStartY;
+    redrawCanvas();
+    redrawSelectedItems(dragOffsetX, dragOffsetY);
     }
-});
+    });
 
+
+
+const correctSound = new Audio('sounds/correct.mp3');
+const wrongSound = new Audio('sounds/wrong.mp3'); 
 
 canvas.addEventListener('mouseup', function(event) {
     isDragging = false;
@@ -394,6 +404,10 @@ canvas.addEventListener('mouseup', function(event) {
                         customer.timeAtTable = 0; // Reset the waiting time
                         earnings += calculateSelectedItemsPrice(selectedItems);
                         staticElements.drawEarnings(ctx, canvas.width, earnings);
+                        
+                        // Sound abspielen
+                        correctSound.play();
+                        
                         setTimeout(() => {
                             customers.splice(index, 1);
                             tables.forEach(table => {
@@ -405,6 +419,9 @@ canvas.addEventListener('mouseup', function(event) {
                         }, 5000);
                     } else {
                         customer.deleteIn = 5; // Setze den Timer auf 5 Sekunden
+                        wrongSound.play();
+                        earnings -= currentItemPrice;
+                        staticElements.drawEarnings(ctx, canvas.width, earnings);
                     }
                     selectedItems = [];
                     currentItemPrice = 0;
@@ -497,7 +514,7 @@ staticElements.createTilePattern(ctx, canvas.width, canvas.height);
             customer.draw(ctx!);
 
             // Kunde wird gelöscht, wenn er länger als 90 Sekunden wartet
-            if (customer.timeAtTable >= 90 || (customer.deleteIn !== null && customer.deleteIn <= 0)) {
+            if (customer.timeAtTable >= 200 || (customer.deleteIn !== null && customer.deleteIn <= 0)) {
                 customers.splice(index, 1);
                 tables.forEach(table => {
                     if (table.x === customer.targetX && table.y === customer.targetY) {
@@ -510,6 +527,7 @@ staticElements.createTilePattern(ctx, canvas.width, canvas.height);
             // Verringere den Timer, falls der Kunde ein falsches Eis bekommen hat
             if (customer.deleteIn !== null) {
                 customer.deleteIn -= 1 / 60; // 1 Sekunde = 60 Frames
+                
             }
 
             if (customer.arrived && !customer.hasTable) {

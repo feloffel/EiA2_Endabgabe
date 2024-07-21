@@ -14,6 +14,10 @@ var EisDealer;
             console.log("Kein Name für die Eisdiele gefunden, Standardname wird verwendet:", ParlourName);
         }
         addCustomer();
+        // Hintergrundmusik laden und abspielen
+        const backgroundMusic = new Audio('sounds/background.mp3'); // Pfad zur Hintergrundmusikdatei anpassen
+        backgroundMusic.loop = true; // Musik in Schleife abspielen
+        backgroundMusic.play();
     });
     // CANVAS ALLGEMEIN
     const canvas = document.getElementById("canvas");
@@ -42,7 +46,7 @@ var EisDealer;
         customers.push(newCustomer);
         console.log("Neuer Kunde hinzugefügt:", newCustomer);
     }
-    setInterval(addCustomer, 20000);
+    setInterval(addCustomer, 10000);
     // Debugging-Informationen
     console.log("Initialisierte Kunden:", customers);
     // EISSORTEN + SPECIALS
@@ -241,8 +245,10 @@ var EisDealer;
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;
         // Überprüfen, ob der Mülleimer angeklickt wurde
+        const trashSound = new Audio('sounds/trash.wav'); // Pfad zur Sounddatei anpassen
         if (x >= staticElements.trashCanX && x <= staticElements.trashCanX + staticElements.trashCanWidth &&
             y >= staticElements.trashCanY && y <= staticElements.trashCanY + staticElements.trashCanHeight) {
+            trashSound.play();
             // Leeren des Arrays mit ausgewählten Elementen
             earnings -= currentItemPrice;
             selectedItems = [];
@@ -297,14 +303,14 @@ var EisDealer;
     canvas.addEventListener('mousemove', function (event) {
         if (isDragging) {
             const rect = canvas.getBoundingClientRect();
-            const x = event.clientX - rect.left;
-            const y = event.clientY - rect.top;
-            dragOffsetX = x;
-            dragOffsetY = y;
+            dragOffsetX = event.clientX - rect.left - dragStartX;
+            dragOffsetY = event.clientY - rect.top - dragStartY;
             redrawCanvas();
-            redrawSelectedItems(dragOffsetX - dragStartX, dragOffsetY - dragStartY);
+            redrawSelectedItems(dragOffsetX, dragOffsetY);
         }
     });
+    const correctSound = new Audio('sounds/correct.mp3');
+    const wrongSound = new Audio('sounds/wrong.mp3');
     canvas.addEventListener('mouseup', function (event) {
         isDragging = false;
         if (selectedItems.length > 0) {
@@ -319,6 +325,8 @@ var EisDealer;
                             customer.timeAtTable = 0; // Reset the waiting time
                             earnings += calculateSelectedItemsPrice(selectedItems);
                             staticElements.drawEarnings(ctx, canvas.width, earnings);
+                            // Sound abspielen
+                            correctSound.play();
                             setTimeout(() => {
                                 customers.splice(index, 1);
                                 tables.forEach(table => {
@@ -331,6 +339,9 @@ var EisDealer;
                         }
                         else {
                             customer.deleteIn = 5; // Setze den Timer auf 5 Sekunden
+                            wrongSound.play();
+                            earnings -= currentItemPrice;
+                            staticElements.drawEarnings(ctx, canvas.width, earnings);
                         }
                         selectedItems = [];
                         currentItemPrice = 0;
@@ -397,7 +408,7 @@ var EisDealer;
             customer.move();
             customer.draw(ctx);
             // Kunde wird gelöscht, wenn er länger als 90 Sekunden wartet
-            if (customer.timeAtTable >= 90 || (customer.deleteIn !== null && customer.deleteIn <= 0)) {
+            if (customer.timeAtTable >= 200 || (customer.deleteIn !== null && customer.deleteIn <= 0)) {
                 customers.splice(index, 1);
                 tables.forEach(table => {
                     if (table.x === customer.targetX && table.y === customer.targetY) {
