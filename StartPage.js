@@ -3,6 +3,11 @@ var EisDealer;
 (function (EisDealer) {
     let button = document.getElementById('StartButton');
     EisDealer.ParlourName = "";
+    window.addEventListener('load', function () {
+        //StartUpJingle abspielen
+        let StartupJingle = new Audio('sounds/StartupJingle.mp3');
+        StartupJingle.play();
+    });
     if (button) {
         // Add an event listener to the button for the 'click' event
         button.addEventListener('click', () => {

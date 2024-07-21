@@ -7,8 +7,8 @@ namespace EisDealer {
         waiting: boolean;
         iceCombination: string[];
         matched: boolean;
-        timeAtTable: number; // Zeit in Sekunden
         deleteIn: number | null; // Zeit in Sekunden, bis der Kunde gelöscht wird, wenn er ein falsches Eis bekommt
+        waitTime: number; // Zeit in Sekunden, die der Kunde gewartet hat
 
         constructor(x: number, y: number) {
             super(x, y);
@@ -19,21 +19,21 @@ namespace EisDealer {
             this.waiting = false;
             this.iceCombination = this.generateRandomIceCombination();
             this.matched = false;
-            this.timeAtTable = 0; // Initialisiere mit 0
             this.deleteIn = null; // Initialisiere mit null
+            this.waitTime = 0; // Initialisiere mit 0
         }
 
         draw(ctx: CanvasRenderingContext2D): void {
             const radius = 30;
             let mouthType = 'smile'; // Standard Mundtyp
         
-            // Ändere die Farbe basierend auf der Zeit am Tisch
+            // Ändere die Farbe basierend auf dem Status des Kunden
             if (this.matched) {
                 ctx.fillStyle = 'blue'; // Blau für Kunden, die das richtige Eis bekommen haben
-            } else if (this.deleteIn !== null || this.timeAtTable >= 190) {
+            } else if (this.deleteIn !== null || this.waitTime >= 90) {
                 ctx.fillStyle = 'red';
                 mouthType = 'sad';
-            } else if (this.timeAtTable >= 100) {
+            } else if (this.waitTime >= 50) {
                 ctx.fillStyle = 'orange';
                 mouthType = 'neutral';
             } else {
@@ -121,11 +121,10 @@ namespace EisDealer {
                         this.y = this.targetY;
                         this.arrived = true;
                     }
-                } else {
-                    // Kunde sitzt am Tisch und wartet
-                    this.timeAtTable += 1 / 60; // Aktualisiere die Zeit (1 Sekunde = 60 Frames)
                 }
             }
+            // Allgemeine Wartezeit erhöhen
+            this.waitTime += 1 / 60; // Aktualisiere die Zeit (1 Sekunde = 60 Frames)
         }
 
         private generateRandomIceCombination(): string[] {

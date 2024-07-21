@@ -3,6 +3,12 @@ namespace EisDealer {
     let button = document.getElementById('StartButton');
     export let ParlourName: string = "";
     
+
+    window.addEventListener('load', function () {
+         //StartUpJingle abspielen
+         let StartupJingle = new Audio ('sounds/StartupJingle.mp3');
+         StartupJingle.play();
+    });
     
     if (button) {
         // Add an event listener to the button for the 'click' event
