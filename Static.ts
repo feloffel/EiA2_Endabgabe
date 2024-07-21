@@ -59,7 +59,7 @@ namespace EisDealer {
 
 
         
-        createSidewalk(ctx: CanvasRenderingContext2D | null, width: number, height: number, MenuWidth: number, rowHeight: number): void {
+        createSidewalk(ctx: CanvasRenderingContext2D | null, width: number, MenuWidth: number, rowHeight: number): void {
             const lineStartX = width; // Startpunkt am rechten Rand des Canvas
             const lineEndX = MenuWidth + (width - MenuWidth) * 0.8 / 3; // Endpunkt bei ca. 0.8/3 des Canvas
             const lineY = rowHeight; // Höhe der Linie, gleiche Höhe wie die erste horizontale Linie

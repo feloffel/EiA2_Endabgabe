@@ -52,7 +52,7 @@ var EisDealer;
                 ctx.fillText(parlourName, textX, textY);
             }
         }
-        createSidewalk(ctx, width, height, MenuWidth, rowHeight) {
+        createSidewalk(ctx, width, MenuWidth, rowHeight) {
             const lineStartX = width; // Startpunkt am rechten Rand des Canvas
             const lineEndX = MenuWidth + (width - MenuWidth) * 0.8 / 3; // Endpunkt bei ca. 0.8/3 des Canvas
             const lineY = rowHeight; // Höhe der Linie, gleiche Höhe wie die erste horizontale Linie

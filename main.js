@@ -13,6 +13,7 @@ var EisDealer;
             ParlourName = "";
             console.log("Kein Name für die Eisdiele gefunden, Standardname wird verwendet:", ParlourName);
         }
+        addCustomer();
     });
     // CANVAS ALLGEMEIN
     const canvas = document.getElementById("canvas");
@@ -41,11 +42,11 @@ var EisDealer;
         customers.push(newCustomer);
         console.log("Neuer Kunde hinzugefügt:", newCustomer);
     }
-    setInterval(addCustomer, 3000);
+    setInterval(addCustomer, 20000);
     // Debugging-Informationen
     console.log("Initialisierte Kunden:", customers);
     // EISSORTEN + SPECIALS
-    const iceCreams = [
+    EisDealer.iceCreams = [
         new EisDealer.IceCream("Vanille", 1.5, "#FDF2CC"),
         new EisDealer.IceCream("Schokolade", 1.8, "#84563C"),
         new EisDealer.IceCream("Zitrone", 1.7, "#fff700"),
@@ -55,7 +56,7 @@ var EisDealer;
         new EisDealer.IceCream("Mango", 1.6, "#F4BB44"),
         new EisDealer.IceCream("Blaubeere", 1.6, "#4F86F7")
     ];
-    const specials = [
+    EisDealer.specials = [
         new EisDealer.Special("Kirsche", 0.5, (ctx, x, y, width, height) => {
             ctx.fillStyle = "#ff0000";
             ctx.beginPath();
@@ -192,7 +193,7 @@ var EisDealer;
             ctx.fill();
         })
     ];
-    const bases = [
+    EisDealer.bases = [
         new EisDealer.Base("Eisbecher", 0, (ctx, x, y, width, height) => {
             ctx.fillStyle = "white"; // Beige Farbe für den Becher
             ctx.beginPath();
@@ -245,13 +246,14 @@ var EisDealer;
             // Leeren des Arrays mit ausgewählten Elementen
             earnings -= currentItemPrice;
             selectedItems = [];
+            currentItemPrice = 0; // Setze den Preis auf Null
             redrawCanvas();
             staticElements.drawEarnings(ctx, canvas.width, earnings);
             return;
         }
         let itemClicked = false;
         // Check if a base was clicked
-        bases.forEach((base, index) => {
+        EisDealer.bases.forEach((base, index) => {
             if (base.isClicked(x, y, index, canvas.width, canvas.height)) {
                 console.log(`${base.name} clicked`);
                 selectedItems.push(base);
@@ -259,7 +261,7 @@ var EisDealer;
             }
         });
         // Check if a special was clicked
-        specials.forEach((special, index) => {
+        EisDealer.specials.forEach((special, index) => {
             if (special.isClicked(x, y, index, canvas.width, canvas.height)) {
                 console.log(`${special.name} clicked`);
                 selectedItems.push(special);
@@ -267,7 +269,7 @@ var EisDealer;
             }
         });
         // Check if an ice cream was clicked
-        iceCreams.forEach((iceCream, index) => {
+        EisDealer.iceCreams.forEach((iceCream, index) => {
             if (iceCream.isClicked(x, y, index, canvas.width, canvas.height)) {
                 console.log(`${iceCream.name} clicked`);
                 selectedItems.push(iceCream);
@@ -305,18 +307,42 @@ var EisDealer;
     });
     canvas.addEventListener('mouseup', function (event) {
         isDragging = false;
+        if (selectedItems.length > 0) {
+            const selectedCombination = selectedItems.map(item => item.name);
+            customers.forEach((customer, index) => {
+                if (customer.hasTable && customer.arrived && !customer.matched) {
+                    const distance = Math.sqrt((event.clientX - canvas.getBoundingClientRect().left - customer.x) ** 2 +
+                        (event.clientY - canvas.getBoundingClientRect().top - customer.y) ** 2);
+                    if (distance < 30) {
+                        if (customer.checkCombination(selectedCombination)) {
+                            customer.matched = true;
+                            customer.timeAtTable = 0; // Reset the waiting time
+                            earnings += calculateSelectedItemsPrice(selectedItems);
+                            staticElements.drawEarnings(ctx, canvas.width, earnings);
+                            setTimeout(() => {
+                                customers.splice(index, 1);
+                                tables.forEach(table => {
+                                    if (table.x === customer.targetX && table.y === customer.targetY) {
+                                        table.occupied = false;
+                                    }
+                                });
+                                moveWaitingCustomerToTable();
+                            }, 5000);
+                        }
+                        else {
+                            customer.deleteIn = 5; // Setze den Timer auf 5 Sekunden
+                        }
+                        selectedItems = [];
+                        currentItemPrice = 0;
+                        redrawCanvas();
+                    }
+                }
+            });
+        }
     });
     function redrawCanvas() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        staticElements.createTilePattern(ctx, canvas.width, canvas.height);
-        staticElements.createMenu(ctx, canvas.width, canvas.height, ParlourName);
-        staticElements.createSidewalk(ctx, canvas.width, canvas.height, menuWidth, rowHeight);
-        staticElements.drawTrashCan(ctx, rowHeight);
-        EisDealer.IceCream.drawIceCreamColors(ctx, canvas.width, canvas.height, iceCreams);
-        EisDealer.Base.drawBases(ctx, canvas.width, canvas.height, bases);
-        EisDealer.Special.drawSpecials(ctx, canvas.width, canvas.height, specials);
+        ctx.putImageData(staticImageData, 0, 0);
         staticElements.drawEarnings(ctx, canvas.width, earnings);
-        staticElements.drawTables(ctx, tablePositions);
     }
     function redrawSelectedItems(offsetX = 0, offsetY = 0) {
         const margin = 10;
@@ -325,7 +351,7 @@ var EisDealer;
         const initialY = canvas.height / 5 - margin;
         let baseY = initialY;
         let stackHeight = 0;
-        selectedItems.forEach((item, index) => {
+        selectedItems.forEach((item) => {
             if (!(item instanceof EisDealer.Base)) {
                 const y = baseY - stackHeight - 30 + offsetY;
                 if (item instanceof EisDealer.IceCream) {
@@ -354,14 +380,14 @@ var EisDealer;
     staticElements.createTilePattern(ctx, canvas.width, canvas.height);
     staticElements.createMenu(ctx, canvas.width, canvas.height, ParlourName);
     staticElements.drawTables(ctx, tablePositions);
-    staticElements.createSidewalk(ctx, canvas.width, canvas.height, menuWidth, rowHeight);
+    staticElements.createSidewalk(ctx, canvas.width, menuWidth, rowHeight);
     staticElements.drawTrashCan(ctx, rowHeight);
     // Zeichne Eiscreme und Specials
-    EisDealer.IceCream.drawIceCreamColors(ctx, canvas.width, canvas.height, iceCreams);
-    EisDealer.Base.drawBases(ctx, canvas.width, canvas.height, bases);
-    EisDealer.Special.drawSpecials(ctx, canvas.width, canvas.height, specials);
-    console.log("Angebot:", iceCreams);
-    console.log("Specials", specials);
+    EisDealer.IceCream.drawIceCreamColors(ctx, canvas.width, canvas.height, EisDealer.iceCreams);
+    EisDealer.Base.drawBases(ctx, canvas.width, canvas.height, EisDealer.bases);
+    EisDealer.Special.drawSpecials(ctx, canvas.width, canvas.height, EisDealer.specials);
+    console.log("Angebot:", EisDealer.iceCreams);
+    console.log("Specials", EisDealer.specials);
     // Speichern des Bildes der statischen Elemente
     staticImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     function update() {
@@ -370,6 +396,20 @@ var EisDealer;
         customers.forEach((customer, index) => {
             customer.move();
             customer.draw(ctx);
+            // Kunde wird gelöscht, wenn er länger als 90 Sekunden wartet
+            if (customer.timeAtTable >= 90 || (customer.deleteIn !== null && customer.deleteIn <= 0)) {
+                customers.splice(index, 1);
+                tables.forEach(table => {
+                    if (table.x === customer.targetX && table.y === customer.targetY) {
+                        table.occupied = false;
+                    }
+                });
+                moveWaitingCustomerToTable();
+            }
+            // Verringere den Timer, falls der Kunde ein falsches Eis bekommen hat
+            if (customer.deleteIn !== null) {
+                customer.deleteIn -= 1 / 60; // 1 Sekunde = 60 Frames
+            }
             if (customer.arrived && !customer.hasTable) {
                 const freeTable = tables.find(table => !table.occupied);
                 if (freeTable) {
@@ -379,14 +419,6 @@ var EisDealer;
                     customer.arrived = false;
                     customer.waiting = false;
                     freeTable.occupied = true;
-                    setTimeout(() => {
-                        const idx = customers.indexOf(customer);
-                        if (idx > -1) {
-                            customers.splice(idx, 1);
-                            freeTable.occupied = false;
-                            moveWaitingCustomerToTable();
-                        }
-                    }, 35000);
                 }
                 else {
                     customer.waiting = true;
@@ -425,14 +457,6 @@ var EisDealer;
                 waitingCustomer.waiting = false;
                 freeTable.occupied = true;
                 waitingCustomer.arrived = false;
-                setTimeout(() => {
-                    const idx = customers.indexOf(waitingCustomer);
-                    if (idx > -1) {
-                        customers.splice(idx, 1);
-                        freeTable.occupied = false;
-                        moveWaitingCustomerToTable();
-                    }
-                }, 35000);
             }
         }
     }

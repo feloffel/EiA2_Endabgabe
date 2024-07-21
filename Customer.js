@@ -7,6 +7,10 @@ var EisDealer;
         hasTable;
         arrived;
         waiting;
+        iceCombination;
+        matched;
+        timeAtTable; // Zeit in Sekunden
+        deleteIn; // Zeit in Sekunden, bis der Kunde gelöscht wird, wenn er ein falsches Eis bekommt
         constructor(x, y) {
             super(x, y);
             this.targetX = x;
@@ -14,13 +18,31 @@ var EisDealer;
             this.hasTable = false;
             this.arrived = false;
             this.waiting = false;
+            this.iceCombination = this.generateRandomIceCombination();
+            this.matched = false;
+            this.timeAtTable = 0; // Initialisiere mit 0
+            this.deleteIn = null; // Initialisiere mit null
         }
         draw(ctx) {
             const radius = 20;
-            ctx.fillStyle = 'green';
+            // Ändere die Farbe basierend auf der Zeit am Tisch
+            if (this.deleteIn !== null) {
+                ctx.fillStyle = 'red';
+            }
+            else if (this.timeAtTable >= 60) {
+                ctx.fillStyle = 'red';
+            }
+            else if (this.timeAtTable >= 30) {
+                ctx.fillStyle = 'orange';
+            }
+            else {
+                ctx.fillStyle = 'green';
+            }
             ctx.beginPath();
             ctx.arc(this.x, this.y, radius, 0, Math.PI * 2);
             ctx.fill();
+            ctx.strokeStyle = 'black'; // Setze die Umrandungsfarbe auf Schwarz
+            ctx.lineWidth = 1; // Setze die Linienbreite auf 1
             ctx.stroke();
             ctx.fillStyle = 'black';
             ctx.beginPath();
@@ -30,6 +52,29 @@ var EisDealer;
             ctx.beginPath();
             ctx.arc(this.x, this.y + 5, 10, 0, Math.PI, false);
             ctx.stroke();
+            if (this.hasTable && this.arrived) {
+                ctx.font = '12px Arial';
+                const padding = 10;
+                const lineHeight = 16;
+                const bubbleHeight = (this.iceCombination.length * lineHeight) + (padding * 2);
+                let maxTextWidth = 0;
+                this.iceCombination.forEach(line => {
+                    const textWidth = ctx.measureText(line).width;
+                    if (textWidth > maxTextWidth) {
+                        maxTextWidth = textWidth;
+                    }
+                });
+                const bubbleWidth = maxTextWidth + padding * 2;
+                ctx.fillStyle = 'white';
+                ctx.fillRect(this.x - bubbleWidth / 2, this.y - bubbleHeight - 40, bubbleWidth, bubbleHeight);
+                ctx.strokeRect(this.x - bubbleWidth / 2, this.y - bubbleHeight - 40, bubbleWidth, bubbleHeight);
+                ctx.fillStyle = 'black';
+                ctx.textAlign = 'center';
+                this.iceCombination.forEach((line, index) => {
+                    ctx.fillText(line, this.x, this.y - bubbleHeight - 40 + padding + (index + 1) * lineHeight - 4);
+                });
+                ctx.textAlign = 'left';
+            }
         }
         move() {
             if (!this.hasTable && !this.waiting) {
@@ -58,9 +103,35 @@ var EisDealer;
                     else {
                         this.x = this.targetX;
                         this.y = this.targetY;
+                        this.arrived = true;
                     }
                 }
+                else {
+                    // Kunde sitzt am Tisch und wartet
+                    this.timeAtTable += 1 / 60; // Aktualisiere die Zeit (1 Sekunde = 60 Frames)
+                }
             }
+        }
+        generateRandomIceCombination() {
+            const base = EisDealer.bases[Math.floor(Math.random() * EisDealer.bases.length)].name;
+            const iceCreamCount = Math.floor(Math.random() * 3) + 1;
+            const iceCreamsSelected = [];
+            for (let i = 0; i < iceCreamCount; i++) {
+                iceCreamsSelected.push(EisDealer.iceCreams[Math.floor(Math.random() * EisDealer.iceCreams.length)].name);
+            }
+            const special = EisDealer.specials[Math.floor(Math.random() * EisDealer.specials.length)].name;
+            return [base, ...iceCreamsSelected, special];
+        }
+        checkCombination(selectedCombination) {
+            if (this.iceCombination.length !== selectedCombination.length) {
+                return false;
+            }
+            for (let i = 0; i < this.iceCombination.length; i++) {
+                if (this.iceCombination[i] !== selectedCombination[i]) {
+                    return false;
+                }
+            }
+            return true;
         }
     }
     EisDealer.Customer = Customer;
