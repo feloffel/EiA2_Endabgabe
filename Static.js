@@ -80,28 +80,55 @@ var EisDealer;
             ctx.lineTo(lineEndX, lineY);
             ctx.stroke();
         }
+        // Hinzufügen von Attributen zur Speicherung der Mülleimerposition und -größe
+        trashCanX;
+        trashCanY;
+        trashCanWidth = 20;
+        trashCanHeight = 20;
         drawTrashCan(ctx, rowHeight) {
             ctx.lineWidth = 3;
-            const trashCanWidth = 20;
-            const trashCanHeight = 20;
-            const trashCanX = 130; // Abstand vom linken Rand des ersten Kastens
-            const trashCanY = (rowHeight - trashCanHeight) / 1.5; // etwas unterhalb mittig in der Höhe des großen Kastens
+            // Setzen der Mülleimerposition
+            this.trashCanX = 130; // Abstand vom linken Rand des ersten Kastens
+            this.trashCanY = (rowHeight - this.trashCanHeight) / 1.5; // etwas unterhalb mittig in der Höhe des großen Kastens
             // Mülleimer zeichnen
             ctx.beginPath();
-            ctx.rect(trashCanX, trashCanY, trashCanWidth, trashCanHeight); // Rechteck für den Mülleimer
+            ctx.rect(this.trashCanX, this.trashCanY, this.trashCanWidth, this.trashCanHeight); // Rechteck für den Mülleimer
             ctx.stroke();
             // Deckel zeichnen
             ctx.beginPath();
-            ctx.rect(trashCanX - 5, trashCanY - 10, trashCanWidth + 10, 10); // Rechteck für den Deckel
+            ctx.rect(this.trashCanX - 5, this.trashCanY - 10, this.trashCanWidth + 10, 10); // Rechteck für den Deckel
             ctx.stroke();
             // Vertikale Striche im Mülleimer
             const stricheAbstand = 5;
-            for (let x = trashCanX + stricheAbstand; x < trashCanX + trashCanWidth; x += stricheAbstand) {
+            for (let x = this.trashCanX + stricheAbstand; x < this.trashCanX + this.trashCanWidth; x += stricheAbstand) {
                 ctx.beginPath();
-                ctx.moveTo(x, trashCanY);
-                ctx.lineTo(x, trashCanY + trashCanHeight);
+                ctx.moveTo(x, this.trashCanY);
+                ctx.lineTo(x, this.trashCanY + this.trashCanHeight);
                 ctx.stroke();
             }
+        }
+        drawEarnings(ctx, width, earnings) {
+            const MenuWidth = width / 3;
+            const rowHeight = 720 / 5; // Höhe des Canvas durch 5 geteilt
+            // Text und Währungssymbol in verschiedenen Farben je nach Wert
+            ctx.fillStyle = earnings >= 0 ? 'green' : 'red';
+            ctx.font = '20px Arial';
+            ctx.textAlign = 'center';
+            const textX = 2.5 * (MenuWidth / 4);
+            const textY = rowHeight / 2 + 20; // Direkt unter dem ParlourName
+            ctx.fillText(`Ertrag: ${earnings.toFixed(2)} €`, textX, textY);
+        }
+        drawTables(ctx, tablePositions) {
+            const tableRadius = 80;
+            ctx.fillStyle = '#8B4513';
+            ctx.strokeStyle = 'black';
+            ctx.lineWidth = 2;
+            tablePositions.forEach(position => {
+                ctx.beginPath();
+                ctx.arc(position.x, position.y, tableRadius, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+            });
         }
     }
     EisDealer.Static = Static;

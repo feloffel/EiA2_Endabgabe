@@ -57,6 +57,8 @@ namespace EisDealer {
             }
         }
 
+
+        
         createSidewalk(ctx: CanvasRenderingContext2D | null, width: number, height: number, MenuWidth: number, rowHeight: number): void {
             const lineStartX = width; // Startpunkt am rechten Rand des Canvas
             const lineEndX = MenuWidth + (width - MenuWidth) * 0.8 / 3; // Endpunkt bei ca. 0.8/3 des Canvas
@@ -90,32 +92,72 @@ namespace EisDealer {
             ctx!.stroke();
         }
 
-        drawTrashCan(ctx: CanvasRenderingContext2D | null, rowHeight: number): void {
-            ctx!.lineWidth = 3;
 
-            const trashCanWidth = 20;
-            const trashCanHeight = 20;
-            const trashCanX = 130; // Abstand vom linken Rand des ersten Kastens
-            const trashCanY = (rowHeight - trashCanHeight) / 1.5; // etwas unterhalb mittig in der Höhe des großen Kastens
 
-            // Mülleimer zeichnen
+        // Hinzufügen von Attributen zur Speicherung der Mülleimerposition und -größe
+    trashCanX: number;
+    trashCanY: number;
+    trashCanWidth: number = 20;
+    trashCanHeight: number = 20;
+
+    drawTrashCan(ctx: CanvasRenderingContext2D | null, rowHeight: number): void {
+        ctx!.lineWidth = 3;
+
+        // Setzen der Mülleimerposition
+        this.trashCanX = 130; // Abstand vom linken Rand des ersten Kastens
+        this.trashCanY = (rowHeight - this.trashCanHeight) / 1.5; // etwas unterhalb mittig in der Höhe des großen Kastens
+
+        // Mülleimer zeichnen
+        ctx!.beginPath();
+        ctx!.rect(this.trashCanX, this.trashCanY, this.trashCanWidth, this.trashCanHeight); // Rechteck für den Mülleimer
+        ctx!.stroke();
+
+        // Deckel zeichnen
+        ctx!.beginPath();
+        ctx!.rect(this.trashCanX - 5, this.trashCanY - 10, this.trashCanWidth + 10, 10); // Rechteck für den Deckel
+        ctx!.stroke();
+
+        // Vertikale Striche im Mülleimer
+        const stricheAbstand = 5;
+        for (let x = this.trashCanX + stricheAbstand; x < this.trashCanX + this.trashCanWidth; x += stricheAbstand) {
             ctx!.beginPath();
-            ctx!.rect(trashCanX, trashCanY, trashCanWidth, trashCanHeight); // Rechteck für den Mülleimer
+            ctx!.moveTo(x, this.trashCanY);
+            ctx!.lineTo(x, this.trashCanY + this.trashCanHeight);
             ctx!.stroke();
-
-            // Deckel zeichnen
-            ctx!.beginPath();
-            ctx!.rect(trashCanX - 5, trashCanY - 10, trashCanWidth + 10, 10); // Rechteck für den Deckel
-            ctx!.stroke();
-
-            // Vertikale Striche im Mülleimer
-            const stricheAbstand = 5;
-            for (let x = trashCanX + stricheAbstand; x < trashCanX + trashCanWidth; x += stricheAbstand) {
-                ctx!.beginPath();
-                ctx!.moveTo(x, trashCanY);
-                ctx!.lineTo(x, trashCanY + trashCanHeight);
-                ctx!.stroke();
-            }
         }
     }
+
+
+
+    drawEarnings(ctx: CanvasRenderingContext2D | null, width: number, earnings: number): void {
+        const MenuWidth = width / 3;
+        const rowHeight = 720 / 5;  // Höhe des Canvas durch 5 geteilt
+
+        // Text und Währungssymbol in verschiedenen Farben je nach Wert
+        ctx!.fillStyle = earnings >= 0 ? 'green' : 'red';
+        ctx!.font = '20px Arial';
+        ctx!.textAlign = 'center';
+        const textX = 2.5 * (MenuWidth / 4);
+        const textY = rowHeight / 2 + 20;  // Direkt unter dem ParlourName
+
+        ctx!.fillText(`Ertrag: ${earnings.toFixed(2)} €`, textX, textY);
+    }
+
+
+    drawTables(ctx: CanvasRenderingContext2D | null, tablePositions: { x: number, y: number }[]): void {
+        const tableRadius = 80;
+
+        ctx!.fillStyle = '#8B4513';
+        ctx!.strokeStyle = 'black';
+        ctx!.lineWidth = 2;
+
+        tablePositions.forEach(position => {
+            ctx!.beginPath();
+            ctx!.arc(position.x, position.y, tableRadius, 0, Math.PI * 2);
+            ctx!.fill();
+            ctx!.stroke();
+        });
+    }
 }
+}
+    
