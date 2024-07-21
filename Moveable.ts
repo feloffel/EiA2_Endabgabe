@@ -3,7 +3,7 @@ namespace EisDealer {
         constructor(public x: number, public y: number) {
             super();
         }
-    
+
         move(): void {
             this.x += 1;
             this.y += 0;

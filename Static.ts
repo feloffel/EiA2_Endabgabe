@@ -85,61 +85,61 @@ namespace EisDealer {
             ctx!.moveTo(lineStartX, lineY);
             ctx!.lineTo(lineEndX, lineY);
             ctx!.stroke();
-            }
-            trashCanX: number;
-            trashCanY: number;
-            trashCanWidth: number = 20;
-            trashCanHeight: number = 20;
-        
-            drawTrashCan(ctx: CanvasRenderingContext2D | null, rowHeight: number): void {
-                ctx!.lineWidth = 3;
-        
-                this.trashCanX = 130;
-                this.trashCanY = (rowHeight - this.trashCanHeight) / 1.5;
-        
+        }
+        trashCanX: number;
+        trashCanY: number;
+        trashCanWidth: number = 20;
+        trashCanHeight: number = 20;
+
+        drawTrashCan(ctx: CanvasRenderingContext2D | null, rowHeight: number): void {
+            ctx!.lineWidth = 3;
+
+            this.trashCanX = 130;
+            this.trashCanY = (rowHeight - this.trashCanHeight) / 1.5;
+
+            ctx!.beginPath();
+            ctx!.rect(this.trashCanX, this.trashCanY, this.trashCanWidth, this.trashCanHeight);
+            ctx!.stroke();
+
+            ctx!.beginPath();
+            ctx!.rect(this.trashCanX - 5, this.trashCanY - 10, this.trashCanWidth + 10, 10);
+            ctx!.stroke();
+
+            let stricheAbstand = 5;
+            for (let x = this.trashCanX + stricheAbstand; x < this.trashCanX + this.trashCanWidth; x += stricheAbstand) {
                 ctx!.beginPath();
-                ctx!.rect(this.trashCanX, this.trashCanY, this.trashCanWidth, this.trashCanHeight);
+                ctx!.moveTo(x, this.trashCanY);
+                ctx!.lineTo(x, this.trashCanY + this.trashCanHeight);
                 ctx!.stroke();
-        
-                ctx!.beginPath();
-                ctx!.rect(this.trashCanX - 5, this.trashCanY - 10, this.trashCanWidth + 10, 10);
-                ctx!.stroke();
-        
-                let stricheAbstand = 5;
-                for (let x = this.trashCanX + stricheAbstand; x < this.trashCanX + this.trashCanWidth; x += stricheAbstand) {
-                    ctx!.beginPath();
-                    ctx!.moveTo(x, this.trashCanY);
-                    ctx!.lineTo(x, this.trashCanY + this.trashCanHeight);
-                    ctx!.stroke();
-                }
-            }
-        
-            drawEarnings(ctx: CanvasRenderingContext2D | null, width: number, earnings: number): void {
-                let MenuWidth = width / 3;
-                let rowHeight = 720 / 5;
-        
-                ctx!.fillStyle = earnings >= 0 ? 'green' : 'red';
-                ctx!.font = '20px Arial';
-                ctx!.textAlign = 'center';
-                let textX = 2.5 * (MenuWidth / 4);
-                let textY = rowHeight / 2 + 20;
-        
-                ctx!.fillText(`Ertrag: ${earnings.toFixed(2)} €`, textX, textY);
-            }
-        
-            drawTables(ctx: CanvasRenderingContext2D | null, tablePositions: { x: number, y: number }[]): void {
-                let tableRadius = 80;
-        
-                ctx!.fillStyle = '#8B4513';
-                ctx!.strokeStyle = 'black';
-                ctx!.lineWidth = 2;
-        
-                tablePositions.forEach(position => {
-                    ctx!.beginPath();
-                    ctx!.arc(position.x, position.y, tableRadius, 0, Math.PI * 2);
-                    ctx!.fill();
-                    ctx!.stroke();
-                });
             }
         }
+
+        drawEarnings(ctx: CanvasRenderingContext2D | null, width: number, earnings: number): void {
+            let MenuWidth = width / 3;
+            let rowHeight = 720 / 5;
+
+            ctx!.fillStyle = earnings >= 0 ? 'green' : 'red';
+            ctx!.font = '20px Arial';
+            ctx!.textAlign = 'center';
+            let textX = 2.5 * (MenuWidth / 4);
+            let textY = rowHeight / 2 + 20;
+
+            ctx!.fillText(`Ertrag: ${earnings.toFixed(2)} €`, textX, textY);
+        }
+
+        drawTables(ctx: CanvasRenderingContext2D | null, tablePositions: { x: number, y: number }[]): void {
+            let tableRadius = 80;
+
+            ctx!.fillStyle = '#8B4513';
+            ctx!.strokeStyle = 'black';
+            ctx!.lineWidth = 2;
+
+            tablePositions.forEach(position => {
+                ctx!.beginPath();
+                ctx!.arc(position.x, position.y, tableRadius, 0, Math.PI * 2);
+                ctx!.fill();
+                ctx!.stroke();
+            });
+        }
+    }
 }

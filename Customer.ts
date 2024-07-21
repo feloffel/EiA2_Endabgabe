@@ -42,7 +42,7 @@ namespace EisDealer {
             ctx.beginPath();
             ctx.arc(this.x, this.y, radius, 0, Math.PI * 2);
             ctx.fill();
-            
+
             ctx.strokeStyle = 'black';
             ctx.lineWidth = 3;
             ctx.stroke();
