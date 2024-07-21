@@ -15,45 +15,43 @@ var EisDealer;
             this.drawFunction(ctx, x, y, width, height);
         }
         static drawSpecials(ctx, canvasWidth, canvasHeight, specials) {
-            const menuWidth = canvasWidth / 3;
-            const columnWidth = menuWidth / 4;
-            const rowHeight = canvasHeight / 5;
-            const margin = 10;
-            const extraBottomMargin = 40;
-            // Startindex anpassen, damit die Specials in der zweiten Zeile und dritten Spalte beginnen
-            let currentCol = 2; // dritte Spalte
-            let currentRow = 1; // zweite Zeile
+            let menuWidth = canvasWidth / 3;
+            let columnWidth = menuWidth / 4;
+            let rowHeight = canvasHeight / 5;
+            let margin = 10;
+            let extraBottomMargin = 40;
+            let currentCol = 2;
+            let currentRow = 1;
             specials.forEach((special) => {
-                const x = currentCol * columnWidth + margin;
-                const y = currentRow * rowHeight + margin;
-                const width = columnWidth - 2 * margin;
-                const height = rowHeight - margin - extraBottomMargin;
+                let x = currentCol * columnWidth + margin;
+                let y = currentRow * rowHeight + margin;
+                let width = columnWidth - 2 * margin;
+                let height = rowHeight - margin - extraBottomMargin;
                 special.draw(ctx, x, y, width, height);
                 ctx.fillStyle = 'white';
                 ctx.font = '16px Arial';
                 ctx.textAlign = 'center';
-                const textX = x + width / 2;
-                const textY = y + height + 20;
+                let textX = x + width / 2;
+                let textY = y + height + 20;
                 ctx.fillText(special.name, textX, textY);
-                // Spalte erhöhen und prüfen, ob wir zur nächsten Zeile springen müssen
                 currentCol++;
-                if (currentCol > 3) { // Da wir 4 Spalten haben, zurück zur ersten Spalte und nächste Zeile
+                if (currentCol > 3) {
                     currentCol = 0;
                     currentRow++;
                 }
             });
         }
         isClicked(x, y, index, canvasWidth, canvasHeight) {
-            const menuWidth = canvasWidth / 3;
-            const columnWidth = menuWidth / 4;
-            const rowHeight = canvasHeight / 5;
-            const margin = 10;
-            let currentCol = (index + 2) % 4; // Berechnung der Spalte basierend auf der Beschreibung
-            let currentRow = 1 + Math.floor((index + 2) / 4); // Berechnung der Zeile basierend auf der Beschreibung
-            const boxX = currentCol * columnWidth + margin;
-            const boxY = currentRow * rowHeight + margin;
-            const boxWidth = columnWidth - 2 * margin;
-            const boxHeight = rowHeight - margin;
+            let menuWidth = canvasWidth / 3;
+            let columnWidth = menuWidth / 4;
+            let rowHeight = canvasHeight / 5;
+            let margin = 10;
+            let currentCol = (index + 2) % 4;
+            let currentRow = 1 + Math.floor((index + 2) / 4);
+            let boxX = currentCol * columnWidth + margin;
+            let boxY = currentRow * rowHeight + margin;
+            let boxWidth = columnWidth - 2 * margin;
+            let boxHeight = rowHeight - margin;
             return x > boxX && x < boxX + boxWidth && y > boxY && y < boxY + boxHeight;
         }
     }

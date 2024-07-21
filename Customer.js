@@ -9,8 +9,8 @@ var EisDealer;
         waiting;
         iceCombination;
         matched;
-        deleteIn; // Zeit in Sekunden, bis der Kunde gelöscht wird, wenn er ein falsches Eis bekommt
-        waitTime; // Zeit in Sekunden, die der Kunde gewartet hat
+        deleteIn;
+        waitTime;
         constructor(x, y) {
             super(x, y);
             this.targetX = x;
@@ -20,15 +20,14 @@ var EisDealer;
             this.waiting = false;
             this.iceCombination = this.generateRandomIceCombination();
             this.matched = false;
-            this.deleteIn = null; // Initialisiere mit null
-            this.waitTime = 0; // Initialisiere mit 0
+            this.deleteIn = null;
+            this.waitTime = 0;
         }
         draw(ctx) {
-            const radius = 30;
-            let mouthType = 'smile'; // Standard Mundtyp
-            // Ändere die Farbe basierend auf dem Status des Kunden
+            let radius = 30;
+            let mouthType = 'smile';
             if (this.matched) {
-                ctx.fillStyle = 'blue'; // Blau für Kunden, die das richtige Eis bekommen haben
+                ctx.fillStyle = 'blue';
             }
             else if (this.deleteIn !== null || this.waitTime >= 90) {
                 ctx.fillStyle = 'red';
@@ -44,40 +43,39 @@ var EisDealer;
             ctx.beginPath();
             ctx.arc(this.x, this.y, radius, 0, Math.PI * 2);
             ctx.fill();
-            ctx.strokeStyle = 'black'; // Setze die Umrandungsfarbe auf Schwarz
-            ctx.lineWidth = 3; // Setze die Linienbreite auf 1
+            ctx.strokeStyle = 'black';
+            ctx.lineWidth = 3;
             ctx.stroke();
             ctx.fillStyle = 'black';
             ctx.beginPath();
             ctx.arc(this.x - 7, this.y - 7, 3, 0, Math.PI * 2);
             ctx.arc(this.x + 7, this.y - 7, 3, 0, Math.PI * 2);
             ctx.fill();
-            // Mund basierend auf mouthType ändern
             ctx.beginPath();
             if (mouthType === 'sad') {
-                ctx.arc(this.x, this.y + 15, 10, Math.PI, 2 * Math.PI, false); // trauriger Mund
+                ctx.arc(this.x, this.y + 15, 10, Math.PI, 2 * Math.PI, false);
             }
             else if (mouthType === 'neutral') {
                 ctx.moveTo(this.x - 10, this.y + 5);
-                ctx.lineTo(this.x + 10, this.y + 5); // horizontaler Strich
+                ctx.lineTo(this.x + 10, this.y + 5);
             }
             else {
-                ctx.arc(this.x, this.y + 5, 10, 0, Math.PI, false); // lachender Mund
+                ctx.arc(this.x, this.y + 5, 10, 0, Math.PI, false);
             }
             ctx.stroke();
             if (this.hasTable && this.arrived) {
                 ctx.font = '12px Arial';
-                const padding = 10;
-                const lineHeight = 16;
-                const bubbleHeight = (this.iceCombination.length * lineHeight) + (padding * 2);
+                let padding = 10;
+                let lineHeight = 16;
+                let bubbleHeight = (this.iceCombination.length * lineHeight) + (padding * 2);
                 let maxTextWidth = 0;
                 this.iceCombination.forEach(line => {
-                    const textWidth = ctx.measureText(line).width;
+                    let textWidth = ctx.measureText(line).width;
                     if (textWidth > maxTextWidth) {
                         maxTextWidth = textWidth;
                     }
                 });
-                const bubbleWidth = maxTextWidth + padding * 2;
+                let bubbleWidth = maxTextWidth + padding * 2;
                 ctx.fillStyle = 'white';
                 ctx.fillRect(this.x - bubbleWidth / 2, this.y - bubbleHeight - 40, bubbleWidth, bubbleHeight);
                 ctx.strokeRect(this.x - bubbleWidth / 2, this.y - bubbleHeight - 40, bubbleWidth, bubbleHeight);
@@ -92,23 +90,21 @@ var EisDealer;
         move() {
             if (!this.hasTable && !this.waiting) {
                 if (this.x > 450) {
-                    this.x -= 2; // Geschwindigkeit des Kunden
+                    this.x -= 2;
                 }
                 else {
                     this.arrived = true;
                 }
             }
             else if (this.waiting) {
-                // Warten, wenn kein Tisch verfügbar ist
                 this.x = this.targetX;
                 this.y = this.targetY;
             }
             else if (this.hasTable) {
-                // Bewege zum Tisch
                 if (this.x !== this.targetX || this.y !== this.targetY) {
-                    const dx = this.targetX - this.x;
-                    const dy = this.targetY - this.y;
-                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    let dx = this.targetX - this.x;
+                    let dy = this.targetY - this.y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
                     if (distance > 1) {
                         this.x += dx / distance;
                         this.y += dy / distance;
@@ -120,17 +116,16 @@ var EisDealer;
                     }
                 }
             }
-            // Allgemeine Wartezeit erhöhen
-            this.waitTime += 1 / 60; // Aktualisiere die Zeit (1 Sekunde = 60 Frames)
+            this.waitTime += 1 / 60;
         }
         generateRandomIceCombination() {
-            const base = EisDealer.bases[Math.floor(Math.random() * EisDealer.bases.length)].name;
-            const iceCreamCount = Math.floor(Math.random() * 3) + 1;
-            const iceCreamsSelected = [];
+            let base = EisDealer.bases[Math.floor(Math.random() * EisDealer.bases.length)].name;
+            let iceCreamCount = Math.floor(Math.random() * 3) + 1;
+            let iceCreamsSelected = [];
             for (let i = 0; i < iceCreamCount; i++) {
                 iceCreamsSelected.push(EisDealer.iceCreams[Math.floor(Math.random() * EisDealer.iceCreams.length)].name);
             }
-            const special = EisDealer.specials[Math.floor(Math.random() * EisDealer.specials.length)].name;
+            let special = EisDealer.specials[Math.floor(Math.random() * EisDealer.specials.length)].name;
             return [base, ...iceCreamsSelected, special];
         }
         checkCombination(selectedCombination) {

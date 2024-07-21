@@ -1,4 +1,3 @@
-
 namespace EisDealer {
 // EISSORTEN können hier vom Nutzer angepasst werden. Dazu muss eine Farbe, ein Preis sowie ein Name festgelegt werden.
 export const iceCreams: IceCream[] = [

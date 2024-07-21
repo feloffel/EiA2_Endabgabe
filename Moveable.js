@@ -10,7 +10,6 @@ var EisDealer;
             this.y = y;
         }
         move() {
-            // Movement logic (placeholder)
             this.x += 1;
             this.y += 0;
         }

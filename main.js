@@ -9,28 +9,25 @@ Quellen: -
 var EisDealer;
 (function (EisDealer) {
     // DEFINIEREN DES NAMENS DER EISDIELE
-    // Abrufen des Namens aus dem localStorage
     let ParlourName = localStorage.getItem('ParlourName');
-    window.addEventListener('load', function () {
+    window.addEventListener('load', () => {
         if (ParlourName) {
             console.log("Der Name deiner Eisdiele lautet:", ParlourName);
         }
         else {
-            // Falls kein Name im localStorage gefunden wurde, wird der Standardname verwendet
             ParlourName = "";
             console.log("Kein Name für die Eisdiele gefunden, Standardname wird verwendet:", ParlourName);
         }
         addCustomer();
-        // Hintergrundmusik laden und abspielen
-        const backgroundMusic = new Audio('sounds/background.mp3'); // Pfad zur Hintergrundmusikdatei anpassen
-        backgroundMusic.loop = true; // Musik in Schleife abspielen
+        const backgroundMusic = new Audio('sounds/background.mp3');
+        backgroundMusic.loop = true;
         backgroundMusic.play();
     });
     // CANVAS ALLGEMEIN
     const canvas = document.getElementById("canvas");
     const ctx = canvas.getContext("2d");
-    canvas.width = 1280; // Width of the canvas
-    canvas.height = 720; // Height of the canvas
+    canvas.width = 1280;
+    canvas.height = 720;
     let earnings = 0;
     let currentItemPrice = 0;
     let staticImageData;
@@ -45,7 +42,6 @@ var EisDealer;
     ];
     const menuWidth = canvas.width / 3;
     const rowHeight = canvas.height / 5;
-    // Tische initialisieren
     const tables = tablePositions.map(position => ({ ...position, occupied: false }));
     const customers = [];
     function addCustomer() {
@@ -54,9 +50,7 @@ var EisDealer;
         console.log("Neuer Kunde hinzugefügt:", newCustomer);
     }
     setInterval(addCustomer, 10000);
-    // Debugging-Informationen
     console.log("Initialisierte Kunden:", customers);
-    //EVENT-LISTENER FÜR MAUSKLICKS
     let selectedItems = [];
     let isDragging = false;
     let dragOffsetX = 0;
@@ -70,47 +64,28 @@ var EisDealer;
         const rect = canvas.getBoundingClientRect();
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;
-        // Überprüfen, ob der Mülleimer angeklickt wurde
-        const trashSound = new Audio('sounds/trash.wav'); // Pfad zur Sounddatei anpassen
+        const trashSound = new Audio('sounds/trash.wav');
         if (x >= staticElements.trashCanX && x <= staticElements.trashCanX + staticElements.trashCanWidth &&
             y >= staticElements.trashCanY && y <= staticElements.trashCanY + staticElements.trashCanHeight) {
             trashSound.play();
-            // Leeren des Arrays mit ausgewählten Elementen
             earnings -= currentItemPrice;
             selectedItems = [];
-            currentItemPrice = 0; // Setze den Preis auf Null
+            currentItemPrice = 0;
             redrawCanvas();
             staticElements.drawEarnings(ctx, canvas.width, earnings);
             return;
         }
         let itemClicked = false;
         const clickSound = new Audio('sounds/click.mp3');
-        // Check if a base was clicked
-        EisDealer.bases.forEach((base, index) => {
-            if (base.isClicked(x, y, index, canvas.width, canvas.height)) {
-                console.log(`${base.name} clicked`);
-                selectedItems.push(base);
-                itemClicked = true;
-                clickSound.play();
-            }
-        });
-        // Check if a special was clicked
-        EisDealer.specials.forEach((special, index) => {
-            if (special.isClicked(x, y, index, canvas.width, canvas.height)) {
-                console.log(`${special.name} clicked`);
-                selectedItems.push(special);
-                itemClicked = true;
-                clickSound.play();
-            }
-        });
-        // Check if an ice cream was clicked
-        EisDealer.iceCreams.forEach((iceCream, index) => {
-            if (iceCream.isClicked(x, y, index, canvas.width, canvas.height)) {
-                console.log(`${iceCream.name} clicked`);
-                selectedItems.push(iceCream);
-                itemClicked = true;
-                clickSound.play();
-            }
+        [EisDealer.bases, EisDealer.specials, EisDealer.iceCreams].forEach((items) => {
+            items.forEach((item, index) => {
+                if (item.isClicked(x, y, index, canvas.width, canvas.height)) {
+                    console.log(`${item.name} clicked`);
+                    selectedItems.push(item);
+                    itemClicked = true;
+                    clickSound.play();
+                }
+            });
         });
         if (itemClicked) {
             redrawSelectedItems();
@@ -154,7 +129,6 @@ var EisDealer;
                             customer.matched = true;
                             earnings += calculateSelectedItemsPrice(selectedItems);
                             staticElements.drawEarnings(ctx, canvas.width, earnings);
-                            // Sound abspielen
                             correctSound.play();
                             setTimeout(() => {
                                 customers.splice(index, 1);
@@ -167,7 +141,7 @@ var EisDealer;
                             }, 5000);
                         }
                         else {
-                            customer.deleteIn = 5; // Setze den Timer auf 5 Sekunden
+                            customer.deleteIn = 5;
                             wrongSound.play();
                             earnings -= currentItemPrice;
                             staticElements.drawEarnings(ctx, canvas.width, earnings);
@@ -216,19 +190,14 @@ var EisDealer;
             }
         });
     }
-    // Erstellen der statischen Elemente (Hintergrund, Menü, Buttons, ...)
     staticElements.createTilePattern(ctx, canvas.width, canvas.height);
     staticElements.createMenu(ctx, canvas.width, canvas.height, ParlourName);
     staticElements.drawTables(ctx, tablePositions);
     staticElements.createSidewalk(ctx, canvas.width, menuWidth, rowHeight);
     staticElements.drawTrashCan(ctx, rowHeight);
-    // Zeichne Eiscreme und Specials
     EisDealer.IceCream.drawIceCreamColors(ctx, canvas.width, canvas.height, EisDealer.iceCreams);
     EisDealer.Base.drawBases(ctx, canvas.width, canvas.height, EisDealer.bases);
     EisDealer.Special.drawSpecials(ctx, canvas.width, canvas.height, EisDealer.specials);
-    console.log("Angebot:", EisDealer.iceCreams);
-    console.log("Specials", EisDealer.specials);
-    // Speichern des Bildes der statischen Elemente
     staticImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     function update() {
         ctx.putImageData(staticImageData, 0, 0);
@@ -236,7 +205,6 @@ var EisDealer;
         customers.forEach((customer, index) => {
             customer.move();
             customer.draw(ctx);
-            // Kunde wird gelöscht, wenn er länger als 90 Sekunden wartet oder deleteIn abgelaufen ist
             if (customer.waitTime >= 125 || (customer.deleteIn !== null && customer.deleteIn <= 0)) {
                 customers.splice(index, 1);
                 tables.forEach(table => {
@@ -246,9 +214,8 @@ var EisDealer;
                 });
                 moveWaitingCustomerToTable();
             }
-            // Verringere den Timer, falls der Kunde ein falsches Eis bekommen hat
             if (customer.deleteIn !== null) {
-                customer.deleteIn -= 1 / 60; // 1 Sekunde = 60 Frames
+                customer.deleteIn -= 1 / 60;
             }
             if (customer.arrived && !customer.hasTable) {
                 const freeTable = tables.find(table => !table.occupied);

@@ -9,44 +9,44 @@ namespace EisDealer {
         }
 
         static drawBases(ctx: CanvasRenderingContext2D, canvasWidth: number, canvasHeight: number, bases: Base[]): void {
-            const columnWidth = canvasWidth / 3 / 4;
-            const rowHeight = canvasHeight / 5;
-            const margin = 10;
-            const extraBottomMargin = 40;
+            let columnWidth = canvasWidth / 3 / 4;
+            let rowHeight = canvasHeight / 5;
+            let margin = 10;
+            let extraBottomMargin = 40;
 
             bases.forEach((base, index) => {
-                const col = index % 2;
-                const row = 1; // Bases befinden sich in der zweiten Zeile
-                const x = col * columnWidth + margin;
-                const y = row * rowHeight + margin;
-                const width = columnWidth - 2 * margin;
-                const height = rowHeight - margin - extraBottomMargin;
-    
+                let col = index % 2;
+                let row = 1;
+                let x = col * columnWidth + margin;
+                let y = row * rowHeight + margin;
+                let width = columnWidth - 2 * margin;
+                let height = rowHeight - margin - extraBottomMargin;
+
                 base.draw(ctx, x, y, width, height);
-    
+
                 ctx.fillStyle = 'white';
                 ctx.font = '16px Arial';
                 ctx.textAlign = 'center';
-                const textX = x + width / 2;
-                const textY = y + height + 20;
+                let textX = x + width / 2;
+                let textY = y + height + 20;
                 ctx.fillText(base.name, textX, textY);
             });
         }
-    
+
         isClicked(x: number, y: number, index: number, canvasWidth: number, canvasHeight: number): boolean {
-            const menuWidth = canvasWidth / 3;
-            const columnWidth = menuWidth / 4;
-            const rowHeight = canvasHeight / 5;
-            const margin = 10;
-    
-            const col = index % 2;
-            const row = 1; // Bases befinden sich in der zweiten Zeile
-    
-            const boxX = col * columnWidth + margin;
-            const boxY = row * rowHeight + margin;
-            const boxWidth = columnWidth - 2 * margin;
-            const boxHeight = rowHeight - margin;
-    
+            let menuWidth = canvasWidth / 3;
+            let columnWidth = menuWidth / 4;
+            let rowHeight = canvasHeight / 5;
+            let margin = 10;
+
+            let col = index % 2;
+            let row = 1;
+
+            let boxX = col * columnWidth + margin;
+            let boxY = row * rowHeight + margin;
+            let boxWidth = columnWidth - 2 * margin;
+            let boxHeight = rowHeight - margin;
+
             return x > boxX && x < boxX + boxWidth && y > boxY && y < boxY + boxHeight;
         }
     }

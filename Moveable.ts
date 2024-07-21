@@ -5,7 +5,6 @@ namespace EisDealer {
         }
     
         move(): void {
-            // Movement logic (placeholder)
             this.x += 1;
             this.y += 0;
         }
