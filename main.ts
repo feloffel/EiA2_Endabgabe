@@ -349,13 +349,12 @@ canvas.addEventListener('mousedown', function(event) {
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
 
-    // Check if the click is inside the preview area
     if (x >= 10 && x <= 70 && y >= 50 && y <= 150) {
         isDragging = true;
         dragStartX = x;
         dragStartY = y;
-        dragOffsetX = x - 10;
-        dragOffsetY = y - 50;
+        dragOffsetX = x;
+        dragOffsetY = y;
     }
 });
 
@@ -365,8 +364,11 @@ canvas.addEventListener('mousemove', function(event) {
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;
 
+        dragOffsetX = x;
+        dragOffsetY = y;
+
         redrawCanvas();
-        redrawSelectedItems(x - dragOffsetX, y - dragOffsetY);
+        redrawSelectedItems(dragOffsetX - dragStartX, dragOffsetY - dragStartY);
     }
 });
 
@@ -497,7 +499,14 @@ staticElements.createTilePattern(ctx, canvas.width, canvas.height);
             }
         });
     
-        redrawSelectedItems();
+        if (isDragging) {
+            const rect = canvas.getBoundingClientRect();
+            const x = dragOffsetX - rect.left;
+            const y = dragOffsetY - rect.top;
+            redrawSelectedItems(x, y);
+        } else {
+            redrawSelectedItems();
+        }
     
         requestAnimationFrame(update);
     }
