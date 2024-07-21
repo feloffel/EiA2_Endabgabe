@@ -1,0 +1,60 @@
+body{
+    font-family: Arial, Helvetica, sans-serif;
+    background-image: url('images/background_LandingPage.jpg');
+    background-size: cover;
+    color: white;
+} 
+
+#shell {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    padding-left: 40px;
+    padding-right: 30px;
+    padding-top: 30px;
+    padding-bottom: 30px;
+    border-radius: 10px;
+    backdrop-filter: blur(500px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 2px solid rgba(255, 255, 255, .2);
+    box-shadow: 0 0 10px rgba(0, 0, 0, .2);
+}
+
+button {
+    display: block;
+    border-radius: 5px;
+    border: none;
+    box-shadow: 0 0 10px rgba(0, 0, 0, .2);
+    padding: 10px;
+    margin-bottom: 10px;
+    margin-top: 5px;
+    margin-right: 5px;
+    margin-left: 5px;
+    text-decoration: none;
+    background-color: #E7F5FC;
+    color: black;
+    scale: 110%;
+  }
+
+
+  a {
+    text-decoration: none;
+  }
+  
+  button:hover {
+    background-color: #BF7B6E;
+    color: white;
+  
+  }
+
+#StartButton {
+    scale: 130%;
+    background-color: #DF3A99;
+    color: white;
+  }
+  
+  #StartButton:hover {
+    background-color: #E7F5FC;
+    color: #DF3A99;
+  }
